@@ -51,5 +51,3 @@ class MarkovChain:
             length ++
         end
         return title
-
-    
