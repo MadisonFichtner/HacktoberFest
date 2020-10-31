@@ -2,7 +2,7 @@ import pandas as pd
 from numpy.random import choice
 import numpy as np
 
-def read_file(file):
+def read_file(words):
     myfile = open('test_words.txt', encoding='utf8').read()
     list = myfile.split()
     return list
@@ -20,40 +20,49 @@ def make_dict(pairs):
             word_dict[word_1] = [word_2]
     return word_dict
 
-def make_sentence(first_word, word_count, word_dict):
+def make_sentence(first_word, end_words, word_dict):
     chain = [first_word]
 
-    for i in range(word_count):
-        chain.append(np.random.choice(word_dict[chain[-1]]))
+    while len(chain) < 45:
+        next_word = np.random.choice(word_dict[chain[-1]])
+        if next_word not in end_words:
+            chain.append(next_word)
+            continue
+        elif next_word in end_words:
+            if len(chain) > 2:
+                chain.append(next_word)
+                break
+            else:
+                chain.append(next_word)
+
+
+        #chain.append(np.random.choice(word_dict[chain[-1]]))
 
     chain = ' '.join([str(elem) for elem in chain])
     return chain
 
-def main():
-    file = read_file("test_words.txt")
-    pairs = make_pairs(file)
-    word_dict = make_dict(pairs)
+def find_ends(words):
+    end_words = []
+    for word in words:
+        if word[-1] in ['.','!','?'] and word != '.':
+            end_words.append(word)
+    return end_words
 
-    word_count = ""
+def main():
+    words = read_file("test_words.txt")
+    pairs = make_pairs(words)
+    word_dict = make_dict(pairs)
+    end_words = find_ends(words)
+
     first_word = ""
 
     while first_word == "":
         first_word = input("Enter starting word: ")
-        if first_word not in file:
+        if first_word not in words:
             print("Word not found on file, try again")
             first_word = ""
 
-    #while first_word.islower():
-    #    first_word = np.random.choice(file)
-
-    while word_count == "":
-        word_count = input("Enter sentence length: ")
-        word_count = int(word_count)
-        if word_count <= 0:
-            print("Invalid, enter value larger than 0")
-            word_count = ""
-
-    chain = make_sentence(first_word, word_count, word_dict)
+    chain = make_sentence(first_word, end_words, word_dict)
 
     return chain
 
