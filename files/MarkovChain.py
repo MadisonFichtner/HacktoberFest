@@ -1,53 +1,61 @@
-class MarkovChain:
+import pandas as pd
+from numpy.random import choice
+import numpy as np
 
-    def process_file(file_name):
-        for each line
-            words = file split on white space
-            delete common words
-            words.delete("a")
-            words.delete("an")
-            words.delete("and")
-            words.delete("by")
-            words.delete("for")
-            words.delete("from")
-            words.delete("in")
-            words.delete("of")
-            words.delete("on")
-            words.delete("or")
-            words.delete("out")
-            words.delete("the")
-            words.delete("to")
-            words.delete("with")
-            put words into bigram
-                if the occurence doesn't exist yet, set it to 1
-                if the occurence exists, increment
-        return words
+def read_file(file):
+    myfile = open('test_words.txt', encoding='utf8').read()
+    list = myfile.split()
+    return list
 
-    def most_common_word(words):
-        if key doesn't exist
-            return null
-        else if key exists
-            return largest key
+def make_pairs(list):
+    for i in range(len(list)-1):
+        yield (list[i], list[i+1])
 
-    def largest_key(words):
-        return largest largest key
+def make_dict(pairs):
+    word_dict = {}
+    for word_1, word_2 in pairs:
+        if word_1 in word_dict.keys():
+            word_dict[word_1].append(word_2)
+        else:
+            word_dict[word_1] = [word_2]
+    return word_dict
 
-    def cleanup(title):
-        remove special characters and such
+def make_sentence(first_word, word_count, word_dict):
+    chain = [first_word]
 
-    def create_title(word):
-        first words
-        title
-        length
-        while the length is < #
-            word = most_common_word(word)
-            if word = null and length is 1
-                return first_word
-            else if word is null
-                break
-            end
-            break of title includes word
-            title = title + word
-            length ++
-        end
-        return title
+    for i in range(word_count):
+        chain.append(np.random.choice(word_dict[chain[-1]]))
+
+    chain = ' '.join([str(elem) for elem in chain])
+    return chain
+
+def main():
+    file = read_file("test_words.txt")
+    pairs = make_pairs(file)
+    word_dict = make_dict(pairs)
+
+    word_count = ""
+    first_word = ""
+
+    while first_word == "":
+        first_word = input("Enter starting word: ")
+        if first_word not in file:
+            print("Word not found on file, try again")
+            first_word = ""
+
+    #while first_word.islower():
+    #    first_word = np.random.choice(file)
+
+    while word_count == "":
+        word_count = input("Enter sentence length: ")
+        word_count = int(word_count)
+        if word_count <= 0:
+            print("Invalid, enter value larger than 0")
+            word_count = ""
+
+    chain = make_sentence(first_word, word_count, word_dict)
+
+    return chain
+
+chain = main()
+print(chain)
